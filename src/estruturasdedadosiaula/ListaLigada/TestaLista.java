@@ -15,19 +15,17 @@ public class TestaLista {
         Lista<String> listaDeInteiros;
         listaDeInteiros = new Lista<>();
         
-        listaDeInteiros.adiciona("glasidemori@gmail.com");
-        listaDeInteiros.adiciona("caiquedugaich@gmail.com");
-        listaDeInteiros.adiciona("walmir004@gmail.com");
-        listaDeInteiros.adiciona("emailfake@hotmail.com");
+        listaDeInteiros.adicionaFim("glasidemori@gmail.com");
+        listaDeInteiros.adicionaFim("caiquedugaich@gmail.com");
+        listaDeInteiros.adicionaFim("walmir004@gmail.com");
+        listaDeInteiros.adicionaFim("emailfake@hotmail.com");
         
-        No<String> ponteiro = listaDeInteiros.getInicio();
-        
-        while(!listaDeInteiros.estaNulo(ponteiro)){
-            System.out.println(ponteiro.getChave());
-            ponteiro = ponteiro.getProximo();
-        }
-        
-        System.out.println("resultado da busca " + listaDeInteiros.busca("emailfake@outlook.com"));
+       listaDeInteiros.imprime();
+       
+        System.out.println("Removeu o email: " + listaDeInteiros.remove("emailfake@hotmail.com"));
+       
+        listaDeInteiros.imprime();
+        //System.out.println("resultado da busca " + listaDeInteiros.busca("emailfake@outlook.com"));
             
               
     }
