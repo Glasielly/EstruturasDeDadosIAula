@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -27,7 +28,7 @@ public class Lista<T extends Comparable<T>> {
         return objeto == null;
     }
 
-    private boolean estaVazia() {
+    public boolean estaVazia() {
         return estaNulo(this.inicio);
     }
 
@@ -39,18 +40,22 @@ public class Lista<T extends Comparable<T>> {
         No<T> novoNo = criaNo(objeto), anterior = null, ptr = this.inicio;
         if (estaVazia()) {
             this.inicio = this.fim = novoNo;
-        }
-        while (!estaNulo(ptr) && objeto.compareTo(ptr.getChave()) >= 0) {
-            anterior = ptr;
-            ptr = ptr.getProximo();
-        }
-
-        if (estaNulo(anterior)) {
-            novoNo.setProximo(this.inicio);
-            this.inicio = novoNo;
         } else {
-            anterior.setProximo(novoNo);
-            novoNo.setProximo(ptr);
+            while (!estaNulo(ptr) && objeto.compareTo(ptr.getChave()) > 0) {
+                anterior = ptr;
+                ptr = ptr.getProximo();
+            }
+
+            if (estaNulo(anterior)) {
+                novoNo.setProximo(this.inicio);
+                this.inicio = novoNo;
+            } else {
+                anterior.setProximo(novoNo);
+                novoNo.setProximo(ptr);
+                if (estaNulo(ptr)) {
+                    this.fim = novoNo;
+                }
+            }
         }
     }
 
@@ -100,8 +105,14 @@ public class Lista<T extends Comparable<T>> {
         if (!estaNulo(ponteiro)) {
             if (estaNulo(anterior)) {
                 this.inicio = ponteiro.getProximo();
+                if (ponteiro.equals(this.fim)) {
+                    this.fim = ponteiro.getProximo();
+                }
             } else {
                 anterior.setProximo(ponteiro.getProximo());
+                if (estaNulo(ponteiro.getProximo())) {
+                    this.fim = anterior;
+                }
             }
             return ponteiro.getChave();
         }

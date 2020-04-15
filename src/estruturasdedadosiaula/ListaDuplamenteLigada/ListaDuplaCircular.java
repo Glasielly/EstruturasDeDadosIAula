@@ -10,14 +10,13 @@ package estruturasdedadosiaula.ListaDuplamenteLigada;
  * @author glasy
  * @param <T>
  */
-public class ListaDupla<T extends Comparable<T>> {
+public class ListaDuplaCircular<T extends Comparable<T>> {
 
-    private NoDuplo<T> inicio, fim;
+    private NoDuplo<T> inicio;
     private int size;
 
-    public ListaDupla() {
+    public ListaDuplaCircular() {
         this.inicio = null;
-        this.fim = null;
         this.size = 0;
     }
 
@@ -31,6 +30,12 @@ public class ListaDupla<T extends Comparable<T>> {
 
     private NoDuplo<T> criaNo(T objeto) {
         return new NoDuplo<>(objeto);
+    }
+
+    private void adicionaPrimeiroNo(NoDuplo<T> novo) {
+        novo.setAnterior(novo);
+        novo.setProximo(novo);
+        this.inicio = novo;
     }
 
     /**
@@ -48,20 +53,6 @@ public class ListaDupla<T extends Comparable<T>> {
     }
 
     /**
-     * @return the fim
-     */
-    public NoDuplo<T> getFim() {
-        return fim;
-    }
-
-    /**
-     * @param fim the fim to set
-     */
-    public void setFim(NoDuplo<T> fim) {
-        this.fim = fim;
-    }
-
-    /**
      * @return the size
      */
     public int getSize() {
@@ -69,23 +60,18 @@ public class ListaDupla<T extends Comparable<T>> {
     }
 
     private NoDuplo<T> buscaPosicaoParaInserir(T chave) {
-        NoDuplo<T> ptr = this.inicio;
-        while (!estaNulo(ptr) && chave.compareTo(ptr.getChave()) > 0) {
-            ptr = ptr.getProximo();
+        NoDuplo<T> ptr = null;
+        if (!estaVazia()) {
+            ptr = this.inicio;
+            while (!ptr.getProximo().equals(this.inicio) && chave.compareTo(ptr.getChave()) > 0) {
+                ptr = ptr.getProximo();
+            }
         }
         return ptr;
     }
 
-    private void insereNoFim(NoDuplo<T> novo) {
-        this.fim.setProximo(novo);
-        novo.setAnterior(this.fim);
-        this.fim = novo;
-    }
-
-    private void insereNoInicio(NoDuplo<T> novo) {
-        novo.setProximo(this.inicio);
-        this.inicio.setAnterior(novo);
-        this.inicio = novo;
+    private void insereDepoisDoPtr(NoDuplo<T> novo, NoDuplo<T> ptr) {
+        insereAntesDoPtr(novo, ptr.getProximo());
     }
 
     private void insereAntesDoPtr(NoDuplo<T> novo, NoDuplo<T> ptr) {
@@ -98,23 +84,37 @@ public class ListaDupla<T extends Comparable<T>> {
     public void insere(T chave) {
         NoDuplo<T> novo = criaNo(chave);
         if (estaVazia()) {
-            this.inicio = this.fim = novo;
+            this.adicionaPrimeiroNo(novo);
         } else {
             NoDuplo<T> retornoDaBusca = buscaPosicaoParaInserir(chave);
-            if (estaNulo(retornoDaBusca)) {
-                this.insereNoFim(novo);
-            } else if (retornoDaBusca.equals(this.inicio)) {
-                this.insereNoInicio(novo);
+            if (chave.compareTo(retornoDaBusca.getChave()) > 0) {
+                this.insereDepoisDoPtr(novo, retornoDaBusca);
             } else {
                 this.insereAntesDoPtr(novo, retornoDaBusca);
+                if (retornoDaBusca.equals(this.inicio)) {
+                    this.inicio = novo;
+                }
             }
         }
         this.size += 1;
     }
     
-    public T busca(T chave){
+    /**
+     *
+     * @param chave é um objeto do tipo T
+     * @return um objeto NoDuplo de T
+     */
+    public NoDuplo<T> buscaNo(T chave) {
         NoDuplo<T> retornoDaBusca = buscaParaRemover(chave);
-        if (!estaNulo(retornoDaBusca)){
+        if (!estaNulo(retornoDaBusca)) {
+            return retornoDaBusca;
+        }
+        return null;
+    }
+
+    public T busca(T chave) {
+        NoDuplo<T> retornoDaBusca = buscaParaRemover(chave);
+        if (!estaNulo(retornoDaBusca)) {
             return retornoDaBusca.getChave();
         }
         return null;
@@ -128,21 +128,7 @@ public class ListaDupla<T extends Comparable<T>> {
         return null;
     }
 
-    private void removeOInicio() {
-        this.inicio = this.inicio.getProximo();
-        if (this.size == 1) {
-            this.fim = this.inicio;
-        } else {
-            this.inicio.setAnterior(null);
-        }
-    }
-    
-    private void removeOFim(){
-        this.fim = this.fim.getAnterior();
-        this.fim.setProximo(null);
-    }
-    
-    private void removePtr(NoDuplo<T> ptr){
+    private void removePtr(NoDuplo<T> ptr) {
         ptr.getAnterior().setProximo(ptr.getProximo());
         ptr.getProximo().setAnterior(ptr.getAnterior());
     }
@@ -150,14 +136,15 @@ public class ListaDupla<T extends Comparable<T>> {
     public NoDuplo<T> remove(T chave) {
         NoDuplo<T> retornoDaBusca = buscaParaRemover(chave);
         if (!estaNulo(retornoDaBusca)) {
-            if(retornoDaBusca.equals(this.inicio)){
-                this.removeOInicio();
-            }else if(retornoDaBusca.equals(this.fim)){
-                this.removeOFim();
-            }else{
+            if (this.size == 1) {
+                this.inicio = null;
+            } else {
                 this.removePtr(retornoDaBusca);
+                if (retornoDaBusca.equals(this.inicio)) {
+                    this.inicio = this.inicio.getProximo();
+                }
+                this.size -= 1;
             }
-            this.size -= 1;
             return retornoDaBusca;
         }
         return null;
